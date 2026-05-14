@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TipTour for Windows</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="panel-shell">
+      <section class="hero-card">
+        <div>
+          <p class="eyebrow">TipTour for Windows</p>
+          <h1>Desktop companion</h1>
+        </div>
+        <div id="statusBadge" class="status-badge">Session off</div>
+      </section>
+
+      <section class="card">
+        <h2>Gemini API key</h2>
+        <p>Paste your own Gemini API key. TipTour stores it with Electron safeStorage, backed by Windows user protection.</p>
+        <div class="api-key-row">
+          <input id="apiKeyInput" type="password" placeholder="AIza..." autocomplete="off" />
+          <button id="saveApiKeyButton">Save</button>
+        </div>
+        <button id="clearApiKeyButton" class="secondary-button">Clear saved key</button>
+      </section>
+
+      <section class="card split-row">
+        <div>
+          <h2>Autopilot</h2>
+          <p>When enabled, TipTour can click, type, launch apps, open URLs, scroll, and press shortcuts.</p>
+        </div>
+        <label class="switch">
+          <input id="autopilotCheckbox" type="checkbox" />
+          <span></span>
+        </label>
+      </section>
+
+      <section class="card controls-card">
+        <div class="button-row">
+          <button id="startSessionButton">Start session</button>
+          <button id="stopSessionButton" class="secondary-button">Stop</button>
+        </div>
+        <p class="shortcut-note">Global shortcuts: Ctrl+Alt+Space toggles the session. Ctrl+Alt+H opens this panel.</p>
+        <textarea id="promptInput" rows="4" placeholder="Tell TipTour what to do on your Windows desktop..."></textarea>
+        <button id="sendPromptButton">Send prompt</button>
+      </section>
+
+      <section class="card output-card">
+        <h2>Transcript</h2>
+        <div id="transcriptText" class="output-text">No prompt sent yet.</div>
+        <h2>Gemini</h2>
+        <div id="responseText" class="output-text">Gemini responses will appear here.</div>
+        <h2>Workflow</h2>
+        <div id="workflowText" class="output-text">No active workflow.</div>
+        <div id="errorText" class="error-text" hidden></div>
+      </section>
+    </main>
+    <script type="module" src="./renderer.js"></script>
+  </body>
+</html>

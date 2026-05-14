@@ -1,114 +1,130 @@
 <div align="center">
 
-<img src="gemnew.png" alt="TipTour cursor actions" width="900" />
+# TipTour for Windows
 
-# TipTour
-
-**This and That**
+**A Windows tray companion that sees your desktop, understands your requests, and can act for you.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![Platform: macOS 14+](https://img.shields.io/badge/Platform-macOS%2014+-black)](https://www.apple.com/macos)
+[![Platform: Windows 10/11](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue)](https://www.microsoft.com/windows)
 
 </div>
 
-TipTour is a macOS menu bar companion that understands your screen, listens to your voice, and controls your computer for you.
+TipTour has been ported from the original macOS menu-bar project into a Windows tray app. The Windows version is built with Electron + TypeScript so it can live in the notification area, show a compact floating control panel, capture screenshots, send context to Gemini Live, and execute desktop actions through Windows-compatible automation primitives.
 
-Hold the hotkey, say what you want, and TipTour can point, click, type, open apps, edit selected text, or act on a freeform highlighted area.
+## What TipTour Can Do on Windows
 
-## What You Can Say
+- Capture your current desktop and send screen context to Gemini Live.
+- Accept natural-language prompts from the tray panel.
+- Ask Gemini to produce a `submit_workflow_plan` action plan.
+- Execute Autopilot steps such as clicking, double-clicking, right-clicking, typing, opening apps, opening URLs, scrolling, pressing single keys, and pressing keyboard shortcuts.
+- Store your Gemini API key in Electron `safeStorage`, which uses OS-backed user protection on Windows.
+- Run from the Windows notification area instead of opening a normal app window.
 
-- "Open Apple Notes and write a short essay"
-
-Then you can do a freeform highlight by holding Control+Shift and moving your mouse and say
-- "Change this word."
-
-- "Move this over there."
-- "Click the Blank document."
-- "Make this line sound softer."
-- "Guide me through exporting this."
-
-TipTour sees the app/window you are working in, understands the highlighted or hovered area, and keeps actions inside that context.
-
-## How It Works
-
-TipTour combines:
-
-- **Gemini Live** for realtime voice, screen understanding, transcription, and tool calling.
-- **CUA Driver Core** for reliable computer control: clicks, typing, hotkeys, app launch, URLs, scrolling, and browser coordinates.
-- **macOS Accessibility** for native app structure and exact text/element targeting.
-- **Focus Highlight** for "this part" commands: hold the highlight hotkey, paint over an area, then ask TipTour to edit or act on it.
-
-The app runs from the macOS menu bar. No dock icon, no main window.
+> Voice capture is the next Windows-specific integration point. The current Windows port keeps the Gemini Live session, screenshot streaming, tool calling, and Autopilot execution path in place, while the panel prompt is the reliable input surface across Windows 10/11.
 
 ## Controls
 
-- **Ctrl + Option**: toggle voice mode.
-- **Ctrl + Shift + drag**: paint a freeform focus highlight.
-- **Menu bar icon**: open settings, permissions, and mode toggles.
-
-## Modes
-
-- **Autopilot**: TipTour performs actions for you. On by default.
-- **Tour Guide**: TipTour teaches step by step. Off by default.
-- **Neko Mode**: optional playful cursor mode. Off by default.
-
-## Privacy
-
-TipTour needs macOS permissions to work:
-
-| Permission | Used For |
+| Control | Action |
 |---|---|
-| Microphone | Voice input |
-| Screen Recording | Visual context for Gemini |
-| Accessibility | Reading UI structure and controlling apps |
-| Screen Content | ScreenCaptureKit capture |
+| Tray icon click | Open the TipTour panel |
+| `Ctrl + Alt + H` | Open the TipTour panel |
+| `Ctrl + Alt + Space` | Toggle the Gemini Live session |
+| Panel prompt + `Ctrl + Enter` | Send the prompt with screenshots |
 
-Source builds require your own Gemini API key. Paste it into the visible “Gemini API key” field in the menu bar panel; TipTour stores it in macOS Keychain.
+## Install and Run From Source
 
-## Build From Source
+### Requirements
 
-Requirements:
+- Windows 10 or Windows 11
+- Node.js 20+
+- npm 10+
+- A Gemini API key from Google AI Studio
 
-- macOS 14+
-- Xcode 16+
-- Node 20+ only if working on the Cloudflare Worker
+### 1. Clone and install
 
-Open the project:
-
-```bash
-open tiptour-macos.xcodeproj
+```powershell
+git clone https://github.com/<your-user>/<your-fork>.git
+cd <your-fork>
+npm install
 ```
 
-Then in Xcode:
+### 2. Start TipTour in development mode
 
-1. Select the `TipTour` scheme.
-2. Set your signing team.
-3. Press `Cmd+R`.
-4. Paste your Gemini API key into the panel.
-5. Grant the requested macOS permissions.
+```powershell
+npm run dev
+```
 
-Do not build with terminal `xcodebuild` if you are actively testing permissions, because it can invalidate local TCC permission state.
+TipTour starts in the Windows notification area. If the panel does not appear immediately, click the tray icon or press `Ctrl + Alt + H`.
 
-## Worker
+### 3. Add your Gemini API key
 
-The Worker is optional for distribution builds. Source builds do not use the maintainer's Worker URL. To ship your own Worker-backed build, deploy the Worker and set `TipTourWorkerBaseURL` in the app bundle/build settings.
+1. Open the TipTour tray panel.
+2. Paste your Gemini API key into the **Gemini API key** field.
+3. Click **Save**.
+4. Confirm the status controls become available.
 
-```bash
+You can also provide a key for local testing with an environment variable:
+
+```powershell
+$env:TIPTOUR_GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+npm run dev
+```
+
+### 4. Use TipTour
+
+1. Press `Ctrl + Alt + Space` or click **Start session**.
+2. Type a request such as:
+   - “Open Notepad and write a short checklist.”
+   - “Click the search box and type calculator.”
+   - “Open https://example.com.”
+3. Leave **Autopilot** enabled if you want TipTour to perform the actions.
+4. Disable **Autopilot** if you only want to inspect the generated workflow in the panel.
+
+## Build a Windows Installer or Portable App
+
+```powershell
+npm run package:win
+```
+
+Build artifacts are written to `release/`:
+
+- NSIS installer
+- Portable executable
+
+## Optional Cloudflare Worker
+
+The existing Worker is still included for teams that want a small proxy/deployment helper. It is not required for source builds.
+
+```powershell
 cd worker
 npm install
 npx wrangler secret put GEMINI_API_KEY
 npx wrangler deploy
 ```
 
-## Project Notes
+## Project Structure
 
-For the deeper technical map, coding conventions, and agent instructions, see [AGENTS.md](AGENTS.md).
+| Path | Purpose |
+|---|---|
+| `src/main/main.ts` | Electron app entry point, tray lifecycle, panel window, global shortcuts, and IPC handlers. |
+| `src/main/companionManager.ts` | Main Windows companion state machine for configuration, Gemini session lifecycle, screenshot sending, and workflow execution. |
+| `src/main/geminiLiveClient.ts` | Gemini Live WebSocket client with the `submit_workflow_plan` tool declaration. |
+| `src/main/screenCapture.ts` | Windows-compatible desktop screenshot capture. |
+| `src/main/actionExecutor.ts` | Autopilot adapter for mouse, keyboard, typing, app launch, URL open, and scrolling actions. |
+| `src/main/workflowRunner.ts` | Sequential workflow runner that either executes Autopilot steps or reports the plan in teaching mode. |
+| `src/main/configuration.ts` | Safe local API-key and preference storage. |
+| `src/main/preload.ts` | Secure Electron bridge exposed to the renderer. |
+| `src/renderer/*` | Tray panel HTML, CSS, and TypeScript UI. |
+| `src/shared/workflow.ts` | Shared workflow and status types. |
+| `worker/` | Optional Cloudflare Worker proxy/helper. |
 
-## Credits
+## Privacy and Permissions
 
-- [CUA](https://github.com/trycua/cua) for computer-use primitives.
-- [Gemini Live](https://ai.google.dev/gemini-api/docs/live-api) for realtime voice, vision, and tool calling.
-- [oneko](https://github.com/crgimenes/neko) for optional pixel cat sprites.
+TipTour sends screenshots and prompts to Gemini only after you start a session and send a request. Autopilot uses local Windows input automation to perform actions. Review generated workflows in the panel and turn Autopilot off whenever you want TipTour to stop controlling the desktop.
+
+## Notes for Fork Maintainers
+
+This repository was originally a macOS SwiftUI app. The Windows port intentionally removes the Xcode project and macOS-only Accessibility/ScreenCaptureKit/AppKit code because those APIs cannot run on Windows. Windows-specific equivalents now live in the Electron main process and can be iterated independently.
 
 ## License
 

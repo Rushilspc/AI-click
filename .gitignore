@@ -11,3 +11,6 @@ build/
 releases/
 *.xcarchive/
 *.dmg
+
+# generated Electron/TypeScript build output
+dist/

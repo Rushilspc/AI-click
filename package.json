@@ -1,0 +1,51 @@
+{
+  "name": "tiptour-windows",
+  "version": "0.1.0",
+  "description": "Windows tray voice companion that uses Gemini Live to see, listen, and control the desktop.",
+  "private": true,
+  "main": "dist/main/main.js",
+  "scripts": {
+    "dev": "npm run build && electron .",
+    "build": "tsc -p tsconfig.json && npm run copy-renderer-assets",
+    "copy-renderer-assets": "node scripts/copy-renderer-assets.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "package:win": "npm run build && electron-builder --win nsis portable"
+  },
+  "build": {
+    "appId": "com.tiptour.windows",
+    "productName": "TipTour",
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "screenshot-desktop": "^1.15.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/screenshot-desktop": "^1.12.3",
+    "@types/ws": "^8.5.13",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "type": "module"
+}
